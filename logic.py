@@ -1,88 +1,79 @@
-import random
+import copy
+
+import assets as a
+import os
+import time
 
 
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.hand = []
+def initialize():
+    deck = a.Deck()
 
-    def deck(self, deck):
-        self.hand = deck
+    player_1 = a.Player("Player 1")
+    player_2 = a.Player("Player 2")
 
-    def reveal_hand(self):
-        print(f"Deck of {self.name}")
-        for card in self.hand:
-            card.show()
+    deck1, deck2 = deck.split_deck()
 
-    def draw(self):
-        return self.hand.pop(0)
+    player_1.deck(deck1)
+    player_2.deck(deck2)
+
+    return player_1, player_2
 
 
-class Deck:
-    def __init__(self):
-        self.cards = []
-        self.build()
+def logic(sprite1, sprite2):
+    player1 = copy.deepcopy(sprite1)
+    player2 = copy.deepcopy(sprite2)
 
-    def build(self):
-        for suit in ["Diamond", "Club", "Heart", "Spade"]:
-            for rank in range(1, 13):
-                self.cards.append(Card(suit, rank))
-        random.shuffle(self.cards)
+    while True:
+        card = player1.draw()
+        card2 = player2.draw()
 
-    def print_deck(self):
-        for card in self.cards:
-            card.show()
+        print(f"{player1.name} drew: {card.rank} of {card.suit}")
+        print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
 
-    def split_deck(self):
-        mid = len(self.cards) // 2
-        return self.cards[:mid], self.cards[mid:]
+        if card.rank > card2.rank:
+            print(f"\n{player1.name} wins this round!")
+            player1.hand.append(card)
+            player1.hand.append(card2)
+        elif card.rank < card2.rank:
+            print(f"\n{player2.name} wins this round!")
+            player2.hand.append(card)
+            player2.hand.append(card2)
+        else:
+            print("War!")
+            war = True
+            war_set = []
+            while war:
+                war_set.append(card)
+                war_set.append(card2)
 
+                card = player1.draw()
+                card2 = player2.draw()
+                print(f"{player1.name} drew: {card.rank} of {card.suit}")
+                print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
+                if card.rank > card2.rank:
+                    print(f"\n{player1.name} wins this round!")
+                    player1.hand.append(card2)
+                    player1.hand.append(card)
+                    player1.hand.extend(war_set)
+                    war = False
+                elif card.rank < card2.rank:
+                    print(f"\n{player2.name} wins this round!")
+                    player2.hand.append(card)
+                    player2.hand.append(card2)
+                    player2.hand.extend(war_set)
+                    war = False
+                else:
+                    print("War!")
+                    war = True
+        time.sleep(2)
+        os.system('cls')
 
-class Card:
-    def __init__(self, suit, rank):
-        self.suit = suit
-        self.rank = rank
+        if len(player1.hand) == 0:
+            print(f"{player1.name} has no more cards left!")
+            print(f"{player2.name} wins the game!")
+            break
 
-    def show(self):
-        print(f"{self.rank} of {self.suit}")
-
-
-# class Card subtypes:
-
-# class Diamond(Card):
-#     def __init__(self, rank):
-#         super().__init__("Diamond", rank)
-#
-#     def show(self):
-#         print(f"{self.rank} of {self.suit}")
-#
-#
-# class Club(Card):
-#     def __init__(self, rank):
-#         super().__init__("Club", rank)
-#
-#
-# class Heart(Card):
-#     def __init__(self, rank):
-#         super().__init__("Heart", rank)
-#
-#
-# class Spade(Card):
-#     def __init__(self, rank):
-#         super().__init__("Spade", rank)
-#
-#
-# class Hand:
-#     def __init__(self):
-#         self.cards = []
-#
-#     def add_card(self, card):
-#         self.cards.append(card)
-#
-#     def remove_card(self, card):
-#         self.cards.remove(card)
-#
-#     def show(self):
-#         for card in self.cards:
-#             print(card.rank, card.suit)
-#
+        elif len(player2.hand) == 0:
+            print(f"{player2.name} has no more cards left!")
+            print(f"{player1.name} wins the game!")
+            break

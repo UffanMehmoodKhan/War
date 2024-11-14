@@ -1,70 +1,47 @@
-import logic as l
-import os
-import time
-
-var = l.Deck()
-
-player1 = l.Player("Omni")
-player2 = l.Player("AI")
+import random
 
 
-deck_1, deck_2 = var.split_deck()
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
 
-player1.deck(deck_1)
-player2.deck(deck_2)
+    def deck(self, deck):
+        self.hand = deck
+
+    def reveal_hand(self):
+        print(f"Deck of {self.name}")
+        for card in self.hand:
+            card.show()
+
+    def draw(self):
+        return self.hand.pop(0)
 
 
-while True:
-    card = player1.draw()
-    card2 = player2.draw()
+class Deck:
+    def __init__(self):
+        self.cards = []
+        self.build()
 
-    print(f"{player1.name} drew: {card.rank} of {card.suit}")
-    print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
+    def build(self):
+        for suit in ["Diamonds", "Clubs", "Hearts", "Spades"]:
+            for rank in range(1, 13):
+                self.cards.append(Card(suit, rank))
+        random.shuffle(self.cards)
 
-    if card.rank > card2.rank:
-        print(f"\n{player1.name} wins this round!")
-        player1.hand.append(card)
-        player1.hand.append(card2)
-    elif card.rank < card2.rank:
-        print(f"\n{player2.name} wins this round!")
-        player2.hand.append(card)
-        player2.hand.append(card2)
-    else:
-        print("War!")
-        war = True
-        while war:
-            war_set = []
-            war_set.append(card)
-            war_set.append(card2)
+    def print_deck(self):
+        for card in self.cards:
+            card.show()
 
-            card = player1.draw()
-            card2 = player2.draw()
-            print(f"{player1.name} drew: {card.rank} of {card.suit}")
-            print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
-            if card.rank > card2.rank:
-                print(f"\n{player1.name} wins this round!")
-                player1.hand.append(card2)
-                player1.hand.append(card)
-                player1.hand.extend(war_set)
-                war = False
-            elif card.rank < card2.rank:
-                print(f"\n{player2.name} wins this round!")
-                player2.hand.append(card)
-                player2.hand.append(card2)
-                player2.hand.extend(war_set)
-                war = False
-            else:
-                print("War!")
-                war = True
-    #time.sleep(2)
-    os.system('cls')
+    def split_deck(self):
+        mid = len(self.cards) // 2
+        return self.cards[:mid], self.cards[mid:]
 
-    if len(player1.hand) == 0:
-        print(f"{player1.name} has no more cards left!")
-        print(f"{player2.name} wins the game!")
-        break
 
-    elif len(player2.hand) == 0:
-        print(f"{player2.name} has no more cards left!")
-        print(f"{player1.name} wins the game!")
-        break
+class Card:
+    def __init__(self, suit, rank):
+        self.suit = suit
+        self.rank = rank
+
+    def show(self):
+        print(f"{self.rank} of {self.suit}")
