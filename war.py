@@ -11,6 +11,7 @@ clock = pygame.time.Clock()
 running = True
 state = None
 game_state = None
+war_deck = []
 dt = 0
 
 # Colors
@@ -53,7 +54,16 @@ while running:
     else:
         # Back of Deck Design
         screen.blit(card_back, (150, 400))
+        player_1_card_number = largeFont.render(f"{len(player1.hand)}", True, white)
+        player_1_card_numberRect = player_1_card_number.get_rect()
+        player_1_card_numberRect.center = (200, 600)
+        screen.blit(player_1_card_number, player_1_card_numberRect)
+
         screen.blit(card_back, (950, 400))
+        player_2_card_number = largeFont.render(f"{len(player2.hand)}", True, white)
+        player_2_card_numberRect = player_2_card_number.get_rect()
+        player_2_card_numberRect.center = (1000, 600)
+        screen.blit(player_2_card_number, player_2_card_numberRect)
 
         # Draw Card Button
         drawCardButton = pygame.Rect(460, 450, width / 4, 70)
@@ -71,47 +81,64 @@ while running:
                 game_state = "playing"
                 screen.fill(black)
 
-                # Draw cards from players
-                drawn_card = player1.draw()
-                drawn_card2 = player2.draw()
+                if l.winner(player1, player2) is not None:
+                    winner = largeFont.render(f"{l.winner(player1, player2)} wins!", True, white)
+                    winnerRect = winner.get_rect()
+                    winnerRect.center = (width / 2, height / 2)
+                    screen.blit(winner, winnerRect)
+                    state = None
+                    game_state = None
 
-                time.sleep(0.5)
+                else:
 
-                # Load and scale images outside the loop
-                card1 = pygame.image.load(
-                    f"assets/{drawn_card.suit}/{drawn_card.suit}_card_0{drawn_card.rank}.png").convert()
-                card1 = pygame.transform.scale(card1, (100, 150))
-                card2 = pygame.image.load(
-                    f"assets/{drawn_card2.suit}/{drawn_card2.suit}_card_0{drawn_card2.rank}.png").convert()
-                card2 = pygame.transform.scale(card2, (100, 150))
-                screen.blit(card1, (420, 220))
-                screen.blit(card2, (700, 220))
+                    # Draw cards from players
+                    drawn_card = player1.draw()
+                    drawn_card2 = player2.draw()
 
-                # Load Rank Determiner
-                strength = largeFont.render(">", True, white)
-                strengthRect = strength.get_rect()
-                strengthRect.center = (620, 290)
-                screen.blit(strength, strengthRect)
+                    time.sleep(0.5)
 
-                # Player 1 : Info and Card Count
-                sprite_1 = largeFont.render(f"{player1.name}", True, white)
-                sprite_1Rect = sprite_1.get_rect()
-                sprite_1Rect.center = (465, 180)
-                screen.blit(sprite_1, sprite_1Rect)
-                player_1_card_number = largeFont.render(f"{len(player1.hand)}", True, white)
-                player_1_card_numberRect = player_1_card_number.get_rect()
-                player_1_card_numberRect.center = (200, 600)
-                screen.blit(player_1_card_number, player_1_card_numberRect)
+                    rank = l.logic(drawn_card.rank, drawn_card2.rank)
 
-                # Player 2 : Info and Card Count
-                sprite_2 = largeFont.render(f"{player2.name}", True, white)
-                sprite_2Rect = sprite_2.get_rect()
-                sprite_2Rect.center = (750, 180)
-                screen.blit(sprite_2, sprite_2Rect)
-                player_2_card_number = largeFont.render(f"{len(player2.hand)}", True, white)
-                player_2_card_numberRect = player_2_card_number.get_rect()
-                player_2_card_numberRect.center = (1000, 600)
-                screen.blit(player_2_card_number, player_2_card_numberRect)
+                    # Load and scale images outside the loop
+                    card1 = pygame.image.load(
+                        f"assets/{drawn_card.suit}/{drawn_card.suit}_card_0{drawn_card.rank}.png").convert()
+                    card1 = pygame.transform.scale(card1, (100, 150))
+                    card2 = pygame.image.load(
+                        f"assets/{drawn_card2.suit}/{drawn_card2.suit}_card_0{drawn_card2.rank}.png").convert()
+                    card2 = pygame.transform.scale(card2, (100, 150))
+                    screen.blit(card1, (420, 220))
+                    screen.blit(card2, (700, 220))
+
+                    # Load Rank Determiner
+                    if rank == "=":
+                        strength = largeFont.render("WAR!", True, white)
+                        war_deck.append(drawn_card)
+                        war_deck.append(drawn_card2)
+
+                    else:
+                        strength = largeFont.render(rank, True, white)
+
+                    player1, player2 = l.resolve(player1, player2, rank, drawn_card, drawn_card2, war_deck)
+                    strengthRect = strength.get_rect()
+                    strengthRect.center = (620, 290)
+                    screen.blit(strength, strengthRect)
+
+                    # Player 1 : Info and Card Count
+                    sprite_1 = largeFont.render(f"{player1.name}", True, white)
+                    sprite_1Rect = sprite_1.get_rect()
+                    sprite_1Rect.center = (465, 180)
+                    screen.blit(sprite_1, sprite_1Rect)
+
+                    # Player 2 : Info and Card Count
+                    sprite_2 = largeFont.render(f"{player2.name}", True, white)
+                    sprite_2Rect = sprite_2.get_rect()
+                    sprite_2Rect.center = (750, 180)
+                    screen.blit(sprite_2, sprite_2Rect)
+
+                    # player1, player2 = l.resolve(player1, player2, rank, drawn_card, drawn_card2)
+
+
+
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000

@@ -25,7 +25,7 @@ class Deck:
 
     def build(self):
         for suit in ["Diamonds", "Clubs", "Hearts", "Spades"]:
-            for rank in range(1, 13):
+            for rank in range(1, 14):
                 self.cards.append(Card(suit, rank))
         random.shuffle(self.cards)
 

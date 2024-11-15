@@ -19,61 +19,35 @@ def initialize():
     return player_1, player_2
 
 
-def logic(sprite1, sprite2):
-    player1 = copy.deepcopy(sprite1)
-    player2 = copy.deepcopy(sprite2)
+def logic(card_1, card_2):
 
-    while True:
-        card = player1.draw()
-        card2 = player2.draw()
+    if card_1 > card_2:
+        return "<" if card_2 == 1 else ">"
+    elif card_1 < card_2:
+        return ">" if card_1 == 1 else "<"
+    else:
+        return "="
 
-        print(f"{player1.name} drew: {card.rank} of {card.suit}")
-        print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
 
-        if card.rank > card2.rank:
-            print(f"\n{player1.name} wins this round!")
-            player1.hand.append(card)
-            player1.hand.append(card2)
-        elif card.rank < card2.rank:
-            print(f"\n{player2.name} wins this round!")
-            player2.hand.append(card)
-            player2.hand.append(card2)
+def war():
+    pass
+
+
+def winner(player1, player2):
+    if len(player1.hand) == 0 or len(player2.hand) == 0:
+        if len(player2.hand) == 0:
+            return player1.name
         else:
-            print("War!")
-            war = True
-            war_set = []
-            while war:
-                war_set.append(card)
-                war_set.append(card2)
+            return player2.name
+    return None
 
-                card = player1.draw()
-                card2 = player2.draw()
-                print(f"{player1.name} drew: {card.rank} of {card.suit}")
-                print(f"{player2.name} drew: {card2.rank} of {card2.suit}")
-                if card.rank > card2.rank:
-                    print(f"\n{player1.name} wins this round!")
-                    player1.hand.append(card2)
-                    player1.hand.append(card)
-                    player1.hand.extend(war_set)
-                    war = False
-                elif card.rank < card2.rank:
-                    print(f"\n{player2.name} wins this round!")
-                    player2.hand.append(card)
-                    player2.hand.append(card2)
-                    player2.hand.extend(war_set)
-                    war = False
-                else:
-                    print("War!")
-                    war = True
-        time.sleep(2)
-        os.system('cls')
 
-        if len(player1.hand) == 0:
-            print(f"{player1.name} has no more cards left!")
-            print(f"{player2.name} wins the game!")
-            break
+def resolve(player1, player2, rank, drawn_card, drawn_card2, war_deck):
+    if rank == ">":
+        player1.hand.append(drawn_card)
+        player1.hand.append(drawn_card2)
+    elif rank == "<":
+        player2.hand.append(drawn_card)
+        player2.hand.append(drawn_card2)
 
-        elif len(player2.hand) == 0:
-            print(f"{player2.name} has no more cards left!")
-            print(f"{player1.name} wins the game!")
-            break
+    return player1, player2
