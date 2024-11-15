@@ -19,15 +19,15 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 
 # Fonts
-mediumFont = pygame.font.Font("OpenSans-Regular.ttf", 28)
-largeFont = pygame.font.Font("OpenSans-Regular.ttf", 40)
-smallFont = pygame.font.Font("OpenSans-Regular.ttf", 15)
-moveFont = pygame.font.Font("OpenSans-Regular.ttf", 60)
+mediumFont = pygame.font.Font("../OpenSans-Regular.ttf", 28)
+largeFont = pygame.font.Font("../OpenSans-Regular.ttf", 40)
+smallFont = pygame.font.Font("../OpenSans-Regular.ttf", 15)
+moveFont = pygame.font.Font("../OpenSans-Regular.ttf", 60)
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 # Load images once
-card_back = pygame.image.load("assets/Backs/back_0.png").convert()
+card_back = pygame.image.load("../assets/Backs/back_0.png").convert()
 card_back = pygame.transform.scale(card_back, (100, 150))
 
 while running:
@@ -148,10 +148,10 @@ while running:
 
                     # Load and scale images outside the loop
                     card1 = pygame.image.load(
-                        f"assets/{drawn_card.suit}/{drawn_card.suit}_card_0{drawn_card.rank}.png").convert()
+                        f"../assets/{drawn_card.suit}/{drawn_card.suit}_card_0{drawn_card.rank}.png").convert()
                     card1 = pygame.transform.scale(card1, (100, 150))
                     card2 = pygame.image.load(
-                        f"assets/{drawn_card2.suit}/{drawn_card2.suit}_card_0{drawn_card2.rank}.png").convert()
+                        f"../assets/{drawn_card2.suit}/{drawn_card2.suit}_card_0{drawn_card2.rank}.png").convert()
                     card2 = pygame.transform.scale(card2, (100, 150))
                     screen.blit(card1, (300, 220))
                     screen.blit(card2, (530, 220))
@@ -172,6 +172,9 @@ while running:
                         strength = largeFont.render("WAR!", True, white)
                         war_deck.append(drawn_card)
                         war_deck.append(drawn_card2)
+                        for i in range(1):
+                            war_deck.append(player1.draw())
+                            war_deck.append(player2.draw())
                         warDeck = largeFont.render(f"War Deck: {len(war_deck)}", True, white)
                         warDeckRect = warDeck.get_rect()
                         warDeckRect.center = (1050, 180)
