@@ -18,8 +18,10 @@ dt = 0
 black = (0, 0, 0)
 white = (255, 255, 255)
 
+# Fonts
 mediumFont = pygame.font.Font("OpenSans-Regular.ttf", 28)
 largeFont = pygame.font.Font("OpenSans-Regular.ttf", 40)
+smallFont = pygame.font.Font("OpenSans-Regular.ttf", 15)
 moveFont = pygame.font.Font("OpenSans-Regular.ttf", 60)
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
@@ -36,12 +38,37 @@ while running:
 
     if state is None:
         screen.fill("black")
-        playButton = pygame.Rect((width / 2) - 150, 320, width / 4, 70)
+        playButton = pygame.Rect((width / 2) - 150, 500, width / 4, 70)
         play = mediumFont.render("Play War", True, black)
         playRect = play.get_rect()
         playRect.center = playButton.center
         pygame.draw.rect(screen, white, playButton)
         screen.blit(play, playRect)
+
+        # Display rules
+        rules = [
+            "The Deal",
+            "The deck is divided evenly, with each player receiving 26 cards, dealt one at a time, face down.",
+            "Anyone may deal first. Each player places their stack of cards face down, in front of them.",
+            "",
+            "The Play",
+            "Each player turns up a card at the same time and the player with the higher card takes both cards and "
+            "puts them, face down, on the bottom of his stack.",
+            "If the cards are the same rank, it is War. Each player turns up one card face down and one card face up.",
+            ""
+            "The player with the higher cards takes both piles (six cards). If the turned-up cards are again the same "
+            "rank, each player places another card face down and turns another card face up. The player with the "
+            "higher card takes all 10 cards, and so on.",
+            "",
+            "How to Keep Score",
+            "The game ends when one player has won all the cards"
+        ]
+
+        y_offset = 100
+        for line in rules:
+            rule_text = smallFont.render(line, True, white)
+            screen.blit(rule_text, (100, y_offset))
+            y_offset += 30
 
         click, _, _ = pygame.mouse.get_pressed()
         if click == 1:
