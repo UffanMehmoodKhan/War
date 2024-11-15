@@ -1,8 +1,4 @@
-import copy
-
 import assets as a
-import os
-import time
 
 
 def initialize():
@@ -26,7 +22,7 @@ def logic(card_1, card_2):
     elif card_1 < card_2:
         return ">" if card_1 == 1 else "<"
     else:
-        return "="
+        return "WAR!"
 
 
 def war():
@@ -46,8 +42,10 @@ def resolve(player1, player2, rank, drawn_card, drawn_card2, war_deck):
     if rank == ">":
         player1.hand.append(drawn_card)
         player1.hand.append(drawn_card2)
+        player1.hand.extend(war_deck)
     elif rank == "<":
         player2.hand.append(drawn_card)
         player2.hand.append(drawn_card2)
+        player2.hand.extend(war_deck)
 
     return player1, player2

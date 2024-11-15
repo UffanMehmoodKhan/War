@@ -1,7 +1,6 @@
 import pygame
 import logic as l
 import time
-import assets as a
 
 # pygame setup
 pygame.init()
@@ -12,6 +11,7 @@ running = True
 state = None
 game_state = None
 war_deck = []
+player1, player2 = None, None
 dt = 0
 
 # Colors
@@ -23,8 +23,6 @@ largeFont = pygame.font.Font("OpenSans-Regular.ttf", 40)
 moveFont = pygame.font.Font("OpenSans-Regular.ttf", 60)
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-
-player1, player2 = l.initialize()
 
 # Load images once
 card_back = pygame.image.load("assets/Backs/back_0.png").convert()
@@ -51,44 +49,66 @@ while running:
             if playButton.collidepoint(mouse):
                 state = "playing"
                 screen.fill(black)
+
+                # Initialize Players
+                player1, player2 = l.initialize()
+
     else:
+
         # Back of Deck Design
-        screen.blit(card_back, (150, 400))
+        screen.blit(card_back, (170, 400))
         player_1_card_number = largeFont.render(f"{len(player1.hand)}", True, white)
         player_1_card_numberRect = player_1_card_number.get_rect()
         player_1_card_numberRect.center = (200, 600)
         screen.blit(player_1_card_number, player_1_card_numberRect)
 
-        screen.blit(card_back, (950, 400))
+        screen.blit(card_back, (650, 400))
         player_2_card_number = largeFont.render(f"{len(player2.hand)}", True, white)
         player_2_card_numberRect = player_2_card_number.get_rect()
-        player_2_card_numberRect.center = (1000, 600)
+        player_2_card_numberRect.center = (700, 600)
         screen.blit(player_2_card_number, player_2_card_numberRect)
 
         # Draw Card Button
-        drawCardButton = pygame.Rect(460, 450, width / 4, 70)
+        drawCardButton = pygame.Rect(300, 450, width / 4, 70)
         drawCard = mediumFont.render("Draw Card", True, black)
         drawCardRect = drawCard.get_rect()
         drawCardRect.center = drawCardButton.center
         pygame.draw.rect(screen, white, drawCardButton)
         screen.blit(drawCard, drawCardRect)
 
+        if l.winner(player1, player2) is not None:
+            winner = largeFont.render(f"{l.winner(player1, player2)} wins!", True, white)
+            winnerRect = winner.get_rect()
+            winnerRect.center = (1000, 500)
+            screen.blit(winner, winnerRect)
+
         # Game Mechanics
         click, _, _ = pygame.mouse.get_pressed()
         if click == 1:
             mouse = pygame.mouse.get_pos()
             if drawCardButton.collidepoint(mouse):
+                if l.winner(player1, player2) is not None:
+                    state = None
+                    continue
+
                 game_state = "playing"
                 screen.fill(black)
 
-                if l.winner(player1, player2) is not None:
-                    winner = largeFont.render(f"{l.winner(player1, player2)} wins!", True, white)
-                    winnerRect = winner.get_rect()
-                    winnerRect.center = (width / 2, height / 2)
-                    screen.blit(winner, winnerRect)
-                    state = None
-                    game_state = None
+                # Player 1 : Info and Card Count
+                sprite_1 = largeFont.render(f"{player1.name}", True, white)
+                sprite_1Rect = sprite_1.get_rect()
+                sprite_1Rect.center = (345, 180)
+                screen.blit(sprite_1, sprite_1Rect)
 
+                # Player 2 : Info and Card Count
+                sprite_2 = largeFont.render(f"{player2.name}", True, white)
+                sprite_2Rect = sprite_2.get_rect()
+                sprite_2Rect.center = (570, 180)
+                screen.blit(sprite_2, sprite_2Rect)
+
+                if game_state is None:
+                    state = None
+                    continue
                 else:
 
                     # Draw cards from players
@@ -106,39 +126,55 @@ while running:
                     card2 = pygame.image.load(
                         f"assets/{drawn_card2.suit}/{drawn_card2.suit}_card_0{drawn_card2.rank}.png").convert()
                     card2 = pygame.transform.scale(card2, (100, 150))
-                    screen.blit(card1, (420, 220))
-                    screen.blit(card2, (700, 220))
+                    screen.blit(card1, (300, 220))
+                    screen.blit(card2, (530, 220))
 
                     # Load Rank Determiner
-                    if rank == "=":
+                    strength = largeFont.render(rank, True, white)
+                    strengthRect = strength.get_rect()
+                    strengthRect.center = (470, 290)
+                    screen.blit(strength, strengthRect)
+
+                    # Line Divider
+                    start_pos = (820, 100)
+                    end_pos = (820, height - 100)
+                    pygame.draw.line(screen, white, start_pos, end_pos, 5)  # 5 is the width of the line
+
+                    # WAR Case
+                    if rank == "WAR!":
                         strength = largeFont.render("WAR!", True, white)
                         war_deck.append(drawn_card)
                         war_deck.append(drawn_card2)
+                        warDeck = largeFont.render(f"War Deck: {len(war_deck)}", True, white)
+                        warDeckRect = warDeck.get_rect()
+                        warDeckRect.center = (1050, 180)
+                        screen.blit(warDeck, warDeckRect)
 
-                    else:
-                        strength = largeFont.render(rank, True, white)
+                        screen.blit(card_back, (1000, 300))
+                        player_1_card_number = largeFont.render(f"{len(player1.hand)}", True, white)
+                        player_1_card_numberRect = player_1_card_number.get_rect()
+                        player_1_card_numberRect.center = (200, 600)
+                        screen.blit(player_1_card_number, player_1_card_numberRect)
+
+                        screen.blit(card_back, (1050, 300))
+                        player_2_card_number = largeFont.render(f"{len(player2.hand)}", True, white)
+                        player_2_card_numberRect = player_2_card_number.get_rect()
+                        player_2_card_numberRect.center = (700, 600)
+                        screen.blit(player_2_card_number, player_2_card_numberRect)
+
+                        continue
+
+                    # War Deck Count
+                    warDeck = largeFont.render(f"War Deck: {len(war_deck)}", True, white)
+                    warDeckRect = warDeck.get_rect()
+                    warDeckRect.center = (1050, 180)
+                    screen.blit(warDeck, warDeckRect)
+                    start_pos = (820, 100)
+                    end_pos = (820, height - 100)
+                    pygame.draw.line(screen, white, start_pos, end_pos, 5)  # 5 is the width of the line
 
                     player1, player2 = l.resolve(player1, player2, rank, drawn_card, drawn_card2, war_deck)
-                    strengthRect = strength.get_rect()
-                    strengthRect.center = (620, 290)
-                    screen.blit(strength, strengthRect)
-
-                    # Player 1 : Info and Card Count
-                    sprite_1 = largeFont.render(f"{player1.name}", True, white)
-                    sprite_1Rect = sprite_1.get_rect()
-                    sprite_1Rect.center = (465, 180)
-                    screen.blit(sprite_1, sprite_1Rect)
-
-                    # Player 2 : Info and Card Count
-                    sprite_2 = largeFont.render(f"{player2.name}", True, white)
-                    sprite_2Rect = sprite_2.get_rect()
-                    sprite_2Rect.center = (750, 180)
-                    screen.blit(sprite_2, sprite_2Rect)
-
-                    # player1, player2 = l.resolve(player1, player2, rank, drawn_card, drawn_card2)
-
-
-
+                    war_deck = []
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
